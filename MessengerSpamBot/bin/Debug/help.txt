@@ -1,0 +1,36 @@
+Commands:
+	write~MESSAGE
+		writes MESSAGE to chat
+	moveto~ID
+		moves to chat room with ID
+	troll~USERNAME~MESSAGE[~REPEAT]
+		sets the bot to say MESSAGE REPEAT times (1 is default) whenever USERNAME sends a message
+	trollDisable
+		disables trolling of a specific person
+	printTrollMessage
+		prints status for trolling
+	uniformResponse~MESSAGE[~REPEAT]
+		sets the bot to respond with MESSAGE REPEAT times (1 is default) whenever a message is sent
+	uniformResponseDisable
+		disables uniform responding
+	printUniformResponseMessage
+		prints status for uniform response
+	detect~DETECT~MESSAGE[~REPEAT]
+		sets the bot to respond with MESSAGE REPEAT times (1 is default) whenever a DETECT is detected
+	detectDisable
+		disables detection
+	printDetect
+		prints status for detection
+	clear
+		clears the console
+	help
+		prints this help page
+	quit
+		closes the bot
+	exit
+		closes the bot
+Special Symbols:
+	[USERNAME]
+		is replaced with person's username
+	[EMOJI]
+		prompts bot to send the chat's emoji

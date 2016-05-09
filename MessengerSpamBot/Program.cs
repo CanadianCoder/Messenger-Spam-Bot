@@ -89,14 +89,17 @@ namespace MessengerSpamBot
 
         static void SignIn()
         {
-            IWebElement email = driver.FindElement(By.Name("email"));
-            IWebElement password = driver.FindElement(By.Name("pass"));
+            IWebElement emailEntry = driver.FindElement(By.Name("email"));
+            IWebElement passwordEntry = driver.FindElement(By.Name("pass"));
             IWebElement submitButton = driver.FindElement(By.Name("login"));
-            StreamReader reader = new StreamReader(Directory.GetCurrentDirectory() + "\\loginCredentials.txt");
 
-            email.SendKeys(reader.ReadLine());
-            password.SendKeys(reader.ReadLine());
-            reader.Close();
+            Console.Write("Username: ");
+            string email = Console.ReadLine();
+            Console.Write("Password: ");
+            string password = Console.ReadLine();
+
+            emailEntry.SendKeys(email);
+            passwordEntry.SendKeys(password);
 
             submitButton.Click();
             if(driver.Url == signInFailedURL) { throw new Exception("Sign-in failed"); }

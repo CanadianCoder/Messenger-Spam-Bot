@@ -23,6 +23,8 @@ Commands:
 		prints status for detection
 	printStatus
 		prints the status of all processes
+	changeRemoteCommand
+		changes the remote command string (default is "[EXECUTE]")
 	clear
 		clears the console
 	help

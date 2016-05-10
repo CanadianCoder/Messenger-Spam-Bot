@@ -81,6 +81,7 @@ namespace MessengerSpamBot
                 inputThread.Start();
             }
 
+            SpamAction.CheckRemote(troll, uniformResponse, detect, driver);
             troll.Check(driver);
             uniformResponse.Check(driver);
             detect.Check(driver);
@@ -110,122 +111,18 @@ namespace MessengerSpamBot
 
             submitButton.Click();
             if(driver.Url == signInFailedURL) { throw new Exception("Sign-in failed"); }
-            GoToChat(defaultChatRoom);
+            SpamAction.GoToChat(defaultChatRoom, driver);
         }
 
         static void CheckForInput()
         {
-            try
-            {
-                    Console.Write(">");
-                string[] consoleInput = Console.ReadLine().Split('~');
-                switch (consoleInput[0])
-                {
-                    case "write":
-                        SpamAction.WriteToChat(consoleInput[1], driver);
-                        break;
-                    case "moveto":
-                        GoToChat(consoleInput[1]);
-                        break;
-                    case "quit":
-                        Exit();
-                        break;
-                    case "exit":
-                        Exit();
-                        break;
-                    case "trollDisable":
-                        troll.isActive = false;
-                        SpamAction.WriteLineClean("troll specific person is now disabled");
-                        break;
-                    case "troll":
-                        troll.personToTroll = consoleInput[1];
-                        troll.message = consoleInput[2];
-                        if(consoleInput.Length >= 4) { troll.timesToRepeat = int.Parse(consoleInput[3]); }
-                        else { troll.timesToRepeat = 1; }
-                        troll.isActive = true;
-                        SpamAction.WriteLineClean("troll specific person is now active");
-                        break;
-                    case "printTroll":
-                        troll.PrintStatus();
-                        break;
-                    case "uniformResponseDisable":
-                        uniformResponse.isActive = false;
-                        SpamAction.WriteLineClean("uniform response is now disabled");
-                        break;
-                    case "uniformResponse":
-                        uniformResponse.message = consoleInput[1];
-                        uniformResponse.isActive = true;
-                        if (consoleInput.Length >= 3) { uniformResponse.timesToRepeat = int.Parse(consoleInput[2]); }
-                        else { uniformResponse.timesToRepeat = 1; }
-                        SpamAction.WriteLineClean("uniform response is now active");
-                        break;
-                    case "printUniformResponse":
-                        uniformResponse.PrintStatus();
-                        break;
-                    case "detectDisable":
-                        detect.isActive = false;
-                        SpamAction.WriteLineClean("detection is now disabled");
-                        break;
-                    case "detect":
-                        detect.stringToDetect = consoleInput[1];
-                        detect.message = consoleInput[2];
-                        detect.isActive = true;
-                        if (consoleInput.Length >= 4) { detect.timesToRepeat = int.Parse(consoleInput[3]); }
-                        else { detect.timesToRepeat = 1; }
-                        SpamAction.WriteLineClean("detection is now active");
-                        break;
-                    case "printDetect":
-                        detect.PrintStatus();
-                        break;
-                    case "printStatus":
-                        SpamAction.WriteLineClean("Troll status:");
-                        troll.PrintStatus();
-                        SpamAction.WriteLineClean("Uniform response status:");
-                        uniformResponse.PrintStatus();
-                        SpamAction.WriteLineClean("Detect status:");
-                        detect.PrintStatus();
-                        break;
-                    case "clear":
-                        Console.Clear();
-                        break;
-                    case "help":
-                        StreamReader reader = new StreamReader(Directory.GetCurrentDirectory() + "\\help.txt");
-                        string nextLine = reader.ReadLine();
-                        while(nextLine != null)
-                        {
-                            SpamAction.WriteLineClean(nextLine);
-                            nextLine = reader.ReadLine();
-                        }
-                        reader.Close();
-                        break;
-                    default:
-                        SpamAction.WriteLineClean("Error: unknown command");
-                        break;
-                 }
-            }
-            catch (Exception ex)
-            {
-                SpamAction.WriteLineClean("Error: " + ex.Message);
-            }
-        }
-
-        static void Exit()
-        {
-            SpamAction.WriteLineClean("Shutting down ChromeDriver...");
-            driver.Quit();
-            SpamAction.WriteLineClean("Exiting...");
-            Environment.Exit(0);
-        }
-
-        static void GoToChat(string chatID)
-        {
-            SpamAction.WriteLineClean("Moving to chat room " + defaultChatRoom + "...");
-            driver.Navigate().GoToUrl("https://www.messenger.com/t/" + chatID);
-            SpamAction.WriteLineClean("Move successful");
+            Console.Write(">");
+            string command = Console.ReadLine();
+            SpamAction.ExecuteCommand(command, troll, uniformResponse, detect, driver);
         }
     }
 }
- 
+
 class SpamAction
 {
     public SpamAction()
@@ -237,6 +134,134 @@ class SpamAction
     {
         IWebElement emojiButton = driver.FindElement(By.ClassName("_5j_u"));
         emojiButton.Click();
+    }
+
+    private const char commandChar = '~';
+    public static string remoteCommandString = "[EXECUTE]";
+
+
+    public static void CheckRemote(TrollSpecific troll, UniformResponse uniformResponse, Detect detect, IWebDriver driver)
+    {
+        IWebElement lastMessage = driver.FindElement(By.Id("js_2")).FindElements(By.TagName("div")).Last();
+        if (lastMessage.Text.StartsWith(remoteCommandString))
+        {
+            string message = lastMessage.Text.Replace(remoteCommandString, string.Empty);
+            ExecuteCommand(message, troll, uniformResponse, detect, driver);
+        }
+    }
+
+    public static void ExecuteCommand(string command, TrollSpecific troll, UniformResponse uniformResponse,
+                                      Detect detect, IWebDriver driver)
+    {
+        try
+        {
+            string[] consoleInput = command.Split(commandChar);
+            switch (consoleInput[0])
+            {
+                case "write":
+                    SpamAction.WriteToChat(consoleInput[1], driver);
+                    break;
+                case "moveto":
+                    GoToChat(consoleInput[1], driver);
+                    break;
+                case "quit":
+                    Exit(driver);
+                    break;
+                case "exit":
+                    Exit(driver);
+                    break;
+                case "trollDisable":
+                    troll.isActive = false;
+                    SpamAction.WriteLineClean("troll specific person is now disabled");
+                    break;
+                case "troll":
+                    troll.personToTroll = consoleInput[1];
+                    troll.message = consoleInput[2];
+                    if (consoleInput.Length >= 4) { troll.timesToRepeat = int.Parse(consoleInput[3]); }
+                    else { troll.timesToRepeat = 1; }
+                    troll.isActive = true;
+                    SpamAction.WriteLineClean("troll specific person is now active");
+                    break;
+                case "printTroll":
+                    troll.PrintStatus();
+                    break;
+                case "uniformResponseDisable":
+                    uniformResponse.isActive = false;
+                    SpamAction.WriteLineClean("uniform response is now disabled");
+                    break;
+                case "uniformResponse":
+                    uniformResponse.message = consoleInput[1];
+                    uniformResponse.isActive = true;
+                    if (consoleInput.Length >= 3) { uniformResponse.timesToRepeat = int.Parse(consoleInput[2]); }
+                    else { uniformResponse.timesToRepeat = 1; }
+                    SpamAction.WriteLineClean("uniform response is now active");
+                    break;
+                case "printUniformResponse":
+                    uniformResponse.PrintStatus();
+                    break;
+                case "detectDisable":
+                    detect.isActive = false;
+                    SpamAction.WriteLineClean("detection is now disabled");
+                    break;
+                case "detect":
+                    detect.stringToDetect = consoleInput[1];
+                    detect.message = consoleInput[2];
+                    detect.isActive = true;
+                    if (consoleInput.Length >= 4) { detect.timesToRepeat = int.Parse(consoleInput[3]); }
+                    else { detect.timesToRepeat = 1; }
+                    SpamAction.WriteLineClean("detection is now active");
+                    break;
+                case "printDetect":
+                    detect.PrintStatus();
+                    break;
+                case "printStatus":
+                    SpamAction.WriteLineClean("Troll status:");
+                    troll.PrintStatus();
+                    SpamAction.WriteLineClean("Uniform response status:");
+                    uniformResponse.PrintStatus();
+                    SpamAction.WriteLineClean("Detect status:");
+                    detect.PrintStatus();
+                    break;
+                case "changeRemoteCommand":
+                    remoteCommandString = consoleInput[1];
+                    break;
+                case "clear":
+                    Console.Clear();
+                    break;
+                case "help":
+                    StreamReader reader = new StreamReader(Directory.GetCurrentDirectory() + "\\help.txt");
+                    string nextLine = reader.ReadLine();
+                    while (nextLine != null)
+                    {
+                        SpamAction.WriteLineClean(nextLine);
+                        nextLine = reader.ReadLine();
+                    }
+                    reader.Close();
+                    break;
+                default:
+                    SpamAction.WriteLineClean("Error: unknown command");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            SpamAction.WriteLineClean("Error: " + ex.Message);
+        }
+    }
+
+    public static void Exit(IWebDriver driver)
+    {
+        SpamAction.WriteLineClean("Shutting down ChromeDriver...");
+        driver.Quit();
+        SpamAction.WriteLineClean("Exiting...");
+        Environment.Exit(0);
+    }
+
+    public static void GoToChat(string chatID, IWebDriver driver)
+    {
+        SpamAction.WriteLineClean("Moving to chat room " + chatID + "...");
+        driver.Navigate().GoToUrl("https://www.messenger.com/t/" + chatID);
+        SpamAction.WriteLineClean("Move successful");
     }
 
     public static void WriteToChat(string write, IWebDriver driver)
@@ -352,7 +377,6 @@ class UniformResponse : SpamAction
     {
         if (isActive)
         {
-
             IWebElement lastMessage = driver.FindElement(By.Id("js_2")).FindElements(By.TagName("div")).Last();
             IWebElement lastMessageAuthor = driver.FindElement(By.Id("js_2")).FindElements(By.TagName("h5")).Last();
             string response = message;

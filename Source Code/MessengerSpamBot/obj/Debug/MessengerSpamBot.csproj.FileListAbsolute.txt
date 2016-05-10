@@ -2,7 +2,6 @@ C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Messenger
 C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\bin\Debug\MessengerSpamBot.exe.config
 C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\bin\Debug\MessengerSpamBot.exe
 C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\bin\Debug\MessengerSpamBot.pdb
-C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\bin\Debug\WebDriver.xml
 C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\obj\Debug\MessengerSpamBot.csprojResolveAssemblyReference.cache
 C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\obj\Debug\MessengerSpamBot.exe
 C:\Users\Local Admin\OneDrive\Documents\My Projects\Messenger-Spam-Bot\Source Code\MessengerSpamBot\obj\Debug\MessengerSpamBot.pdb
